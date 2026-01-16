@@ -8,7 +8,7 @@ from .serializers import IndustryCategorySerializer, ObjectiveSerializer
 
 
 class IndustryListView(generics.ListAPIView):
-    queryset = IndustryCategory.objects.prefetch_related('subcategories').all()
+    queryset = IndustryCategory.objects.prefetch_related("subcategories").all()
     serializer_class = IndustryCategorySerializer
     permission_classes = [AllowAny]
     pagination_class = None
@@ -25,5 +25,5 @@ class StageListView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        stages = [{'value': value, 'label': label} for value, label in STAGE_CHOICES]
+        stages = [{"value": value, "label": label} for value, label in STAGE_CHOICES]
         return Response(stages)

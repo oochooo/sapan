@@ -4,11 +4,11 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/auth/', include('users.urls')),
-    path('api/profiles/', include('profiles.urls')),
-    path('api/', include('industries.urls')),
-    path('api/', include('connections.urls')),
+    path("admin/", admin.site.urls),
+    path("api/auth/", include("users.urls")),
+    path("api/profiles/", include("profiles.urls")),
+    path("api/", include("industries.urls")),
+    path("api/", include("connections.urls")),
 ]
 
 if settings.DEBUG:

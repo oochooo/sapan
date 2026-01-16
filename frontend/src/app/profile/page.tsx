@@ -1,30 +1,41 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { useAuth } from '@/lib/auth';
-import { profileApi, connectionApi } from '@/lib/api';
-import AuthGuard from '@/components/AuthGuard';
-import Badge from '@/components/Badge';
-import { Card, CardContent } from '@/components/Card';
-import type { FounderProfile, MentorProfile, Connection, ConnectionRequest } from '@/types';
-import { User, Mail, Calendar } from 'lucide-react';
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { useAuth } from "@/lib/auth";
+import { profileApi, connectionApi } from "@/lib/api";
+import AuthGuard from "@/components/AuthGuard";
+import Badge from "@/components/Badge";
+import { Card, CardContent } from "@/components/Card";
+import type {
+  FounderProfile,
+  MentorProfile,
+  Connection,
+  ConnectionRequest,
+} from "@/types";
+import { User, Mail, Calendar } from "lucide-react";
 
 export default function ProfilePage() {
   const { user } = useAuth();
-  const [founderProfile, setFounderProfile] = useState<FounderProfile | null>(null);
-  const [mentorProfile, setMentorProfile] = useState<MentorProfile | null>(null);
+  const [founderProfile, setFounderProfile] = useState<FounderProfile | null>(
+    null,
+  );
+  const [mentorProfile, setMentorProfile] = useState<MentorProfile | null>(
+    null,
+  );
   const [connections, setConnections] = useState<Connection[]>([]);
-  const [pendingRequests, setPendingRequests] = useState<ConnectionRequest[]>([]);
+  const [pendingRequests, setPendingRequests] = useState<ConnectionRequest[]>(
+    [],
+  );
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        if (user?.user_type === 'founder') {
+        if (user?.user_type === "founder") {
           const profile = await profileApi.getFounderProfile();
           setFounderProfile(profile);
-        } else if (user?.user_type === 'mentor') {
+        } else if (user?.user_type === "mentor") {
           const profile = await profileApi.getMentorProfile();
           setMentorProfile(profile);
         }
@@ -34,9 +45,11 @@ export default function ProfilePage() {
           connectionApi.getSentRequests(),
         ]);
         setConnections(connectionsData.results);
-        setPendingRequests(requestsData.results.filter((r) => r.status === 'pending'));
+        setPendingRequests(
+          requestsData.results.filter((r) => r.status === "pending"),
+        );
       } catch (error) {
-        console.error('Error fetching profile data:', error);
+        console.error("Error fetching profile data:", error);
       } finally {
         setIsLoading(false);
       }
@@ -92,7 +105,13 @@ export default function ProfilePage() {
                 </div>
                 <div className="mt-1 flex items-center gap-2 text-sm text-gray-500">
                   <Calendar className="w-4 h-4" />
-                  Joined {user?.created_at ? new Date(user.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : ''}
+                  Joined{" "}
+                  {user?.created_at
+                    ? new Date(user.created_at).toLocaleDateString("en-US", {
+                        month: "long",
+                        year: "numeric",
+                      })
+                    : ""}
                 </div>
               </div>
             </div>
@@ -100,13 +119,19 @@ export default function ProfilePage() {
             <hr className="my-6 border-gray-200" />
 
             {/* Founder Profile */}
-            {user?.user_type === 'founder' && founderProfile && (
+            {user?.user_type === "founder" && founderProfile && (
               <>
                 <div className="mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">Startup</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                    Startup
+                  </h3>
                   <div className="bg-gray-50 rounded-lg p-4">
-                    <p className="text-lg font-medium text-gray-900">{founderProfile.startup_name}</p>
-                    <p className="text-sm text-gray-600">Stage: {founderProfile.stage_display}</p>
+                    <p className="text-lg font-medium text-gray-900">
+                      {founderProfile.startup_name}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      Stage: {founderProfile.stage_display}
+                    </p>
                     <p className="text-sm text-gray-600">
                       Industry: {founderProfile.industry_detail?.name}
                     </p>
@@ -114,12 +139,18 @@ export default function ProfilePage() {
                 </div>
 
                 <div className="mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">About</h3>
-                  <p className="text-gray-600">{founderProfile.about_startup}</p>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                    About
+                  </h3>
+                  <p className="text-gray-600">
+                    {founderProfile.about_startup}
+                  </p>
                 </div>
 
                 <div className="mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">Looking For Help With</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                    Looking For Help With
+                  </h3>
                   <div className="flex flex-wrap gap-2">
                     {founderProfile.objectives_detail.map((objective) => (
                       <Badge key={objective.id}>{objective.name}</Badge>
@@ -130,10 +161,12 @@ export default function ProfilePage() {
             )}
 
             {/* Mentor Profile */}
-            {user?.user_type === 'mentor' && mentorProfile && (
+            {user?.user_type === "mentor" && mentorProfile && (
               <>
                 <div className="mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">Experience</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                    Experience
+                  </h3>
                   <div className="bg-gray-50 rounded-lg p-4">
                     <p className="text-lg font-medium text-gray-900">
                       {mentorProfile.role} @ {mentorProfile.company}
@@ -145,18 +178,24 @@ export default function ProfilePage() {
                 </div>
 
                 <div className="mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">Expertise Industries</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                    Expertise Industries
+                  </h3>
                   <div className="flex flex-wrap gap-2">
-                    {mentorProfile.expertise_industries_detail.map((industry) => (
-                      <Badge key={industry.id} variant="primary">
-                        {industry.name}
-                      </Badge>
-                    ))}
+                    {mentorProfile.expertise_industries_detail.map(
+                      (industry) => (
+                        <Badge key={industry.id} variant="primary">
+                          {industry.name}
+                        </Badge>
+                      ),
+                    )}
                   </div>
                 </div>
 
                 <div className="mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">Can Help With</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                    Can Help With
+                  </h3>
                   <div className="flex flex-wrap gap-2">
                     {mentorProfile.can_help_with_detail.map((objective) => (
                       <Badge key={objective.id}>{objective.name}</Badge>
@@ -170,7 +209,9 @@ export default function ProfilePage() {
 
             {/* Stats */}
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Stats</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                Stats
+              </h3>
               <ul className="space-y-2 text-gray-600">
                 <li>
                   <Link href="/connections" className="hover:text-primary-600">

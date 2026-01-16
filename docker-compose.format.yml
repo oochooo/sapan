@@ -1,0 +1,14 @@
+services:
+  black:
+    image: python:3.12-alpine
+    working_dir: /code
+    volumes:
+      - ./backend:/code
+    command: sh -c "pip install black -q && black --line-length=88 ."
+
+  prettier:
+    image: node:20-alpine
+    working_dir: /code
+    volumes:
+      - ./frontend/src:/code
+    command: sh -c "npm install -g prettier -s && prettier -w ."

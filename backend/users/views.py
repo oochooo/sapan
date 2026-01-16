@@ -3,45 +3,83 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.views import TokenRefreshView
 from django.contrib.auth import get_user_model
+from django.conf import settings
+from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
+from allauth.socialaccount.providers.line.views import LineOAuth2Adapter
+from allauth.socialaccount.providers.oauth2.client import OAuth2Client
+from dj_rest_auth.registration.views import SocialLoginView
 
-from .serializers import UserSerializer, RegisterSerializer, UserUpdateSerializer
+from .serializers import UserSerializer, UserUpdateSerializer, CompleteProfileSerializer
 
 User = get_user_model()
 
 
-class RegisterView(generics.CreateAPIView):
-    queryset = User.objects.all()
-    permission_classes = [AllowAny]
-    serializer_class = RegisterSerializer
+class GoogleLoginView(SocialLoginView):
+    adapter_class = GoogleOAuth2Adapter
+    callback_url = (
+        settings.SOCIALACCOUNT_PROVIDERS["google"]
+        .get("APP", {})
+        .get("callback_url", "http://localhost:3000/auth/callback/google")
+    )
+    client_class = OAuth2Client
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-
+    def get_response(self):
+        response = super().get_response()
+        user = self.user
         refresh = RefreshToken.for_user(user)
-
-        return Response({
-            'user': UserSerializer(user).data,
-            'tokens': {
-                'refresh': str(refresh),
-                'access': str(refresh.access_token),
-            }
-        }, status=status.HTTP_201_CREATED)
-
-
-class LoginView(TokenObtainPairView):
-    permission_classes = [AllowAny]
-
-    def post(self, request, *args, **kwargs):
-        response = super().post(request, *args, **kwargs)
-        if response.status_code == 200:
-            email = request.data.get('email')
-            user = User.objects.get(email=email)
-            response.data['user'] = UserSerializer(user).data
+        response.data = {
+            "user": UserSerializer(user).data,
+            "tokens": {
+                "access": str(refresh.access_token),
+                "refresh": str(refresh),
+            },
+        }
         return response
+
+
+class LineLoginView(SocialLoginView):
+    adapter_class = LineOAuth2Adapter
+    callback_url = (
+        settings.SOCIALACCOUNT_PROVIDERS["line"]
+        .get("APP", {})
+        .get("callback_url", "http://localhost:3000/auth/callback/line")
+    )
+    client_class = OAuth2Client
+
+    def get_response(self):
+        response = super().get_response()
+        user = self.user
+        refresh = RefreshToken.for_user(user)
+        response.data = {
+            "user": UserSerializer(user).data,
+            "tokens": {
+                "access": str(refresh.access_token),
+                "refresh": str(refresh),
+            },
+        }
+        return response
+
+
+class CompleteProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = CompleteProfileSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = request.user
+        user.user_type = serializer.validated_data["user_type"]
+        user.save()
+
+        return Response(
+            {
+                "user": UserSerializer(user).data,
+                "message": "Profile completed successfully.",
+            },
+            status=status.HTTP_200_OK,
+        )
 
 
 class RefreshTokenView(TokenRefreshView):
@@ -53,12 +91,16 @@ class LogoutView(APIView):
 
     def post(self, request):
         try:
-            refresh_token = request.data.get('refresh')
+            refresh_token = request.data.get("refresh")
             token = RefreshToken(refresh_token)
             token.blacklist()
-            return Response({'message': 'Successfully logged out.'}, status=status.HTTP_200_OK)
+            return Response(
+                {"message": "Successfully logged out."}, status=status.HTTP_200_OK
+            )
         except Exception:
-            return Response({'error': 'Invalid token.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "Invalid token."}, status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 class MeView(generics.RetrieveUpdateAPIView):
@@ -69,6 +111,6 @@ class MeView(generics.RetrieveUpdateAPIView):
         return self.request.user
 
     def get_serializer_class(self):
-        if self.request.method in ['PUT', 'PATCH']:
+        if self.request.method in ["PUT", "PATCH"]:
             return UserUpdateSerializer
         return UserSerializer

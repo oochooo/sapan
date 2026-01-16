@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { discoveryApi } from '@/lib/api';
-import AuthGuard from '@/components/AuthGuard';
-import Badge from '@/components/Badge';
-import type { FounderProfile } from '@/types';
-import { ArrowLeft, User } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
+import { discoveryApi } from "@/lib/api";
+import AuthGuard from "@/components/AuthGuard";
+import Badge from "@/components/Badge";
+import type { FounderProfile } from "@/types";
+import { ArrowLeft, User } from "lucide-react";
 
 export default function FounderDetailPage() {
   const params = useParams();
@@ -21,8 +21,8 @@ export default function FounderDetailPage() {
         const data = await discoveryApi.getFounder(Number(params.id));
         setFounder(data);
       } catch (error) {
-        console.error('Error fetching founder:', error);
-        router.push('/founders');
+        console.error("Error fetching founder:", error);
+        router.push("/founders");
       } finally {
         setIsLoading(false);
       }
@@ -74,10 +74,14 @@ export default function FounderDetailPage() {
               <h1 className="text-2xl font-bold text-gray-900">
                 {founder.user.first_name} {founder.user.last_name}
               </h1>
-              <p className="text-lg text-gray-600">Founder @ {founder.startup_name}</p>
+              <p className="text-lg text-gray-600">
+                Founder @ {founder.startup_name}
+              </p>
               <div className="mt-2 flex flex-wrap gap-2">
                 {founder.industry_detail && (
-                  <Badge variant="primary">{founder.industry_detail.name}</Badge>
+                  <Badge variant="primary">
+                    {founder.industry_detail.name}
+                  </Badge>
                 )}
                 <Badge>{founder.stage_display}</Badge>
               </div>
@@ -88,20 +92,24 @@ export default function FounderDetailPage() {
 
           {/* About Startup */}
           <div className="mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-3">About the Startup</h2>
-            <p className="text-gray-600 whitespace-pre-wrap">{founder.about_startup}</p>
+            <h2 className="text-lg font-semibold text-gray-900 mb-3">
+              About the Startup
+            </h2>
+            <p className="text-gray-600 whitespace-pre-wrap">
+              {founder.about_startup}
+            </p>
           </div>
 
           <hr className="my-6 border-gray-200" />
 
           {/* Looking For Help With */}
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-3">Looking For Help With</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-3">
+              Looking For Help With
+            </h2>
             <div className="flex flex-wrap gap-2">
               {founder.objectives_detail.map((objective) => (
-                <Badge key={objective.id}>
-                  {objective.name}
-                </Badge>
+                <Badge key={objective.id}>{objective.name}</Badge>
               ))}
             </div>
           </div>

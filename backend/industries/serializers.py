@@ -5,7 +5,7 @@ from .models import IndustryCategory, IndustrySubcategory, Objective, STAGE_CHOI
 class IndustrySubcategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = IndustrySubcategory
-        fields = ['id', 'name', 'slug']
+        fields = ["id", "name", "slug"]
 
 
 class IndustryCategorySerializer(serializers.ModelSerializer):
@@ -13,13 +13,13 @@ class IndustryCategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = IndustryCategory
-        fields = ['id', 'name', 'slug', 'subcategories']
+        fields = ["id", "name", "slug", "subcategories"]
 
 
 class ObjectiveSerializer(serializers.ModelSerializer):
     class Meta:
         model = Objective
-        fields = ['id', 'name', 'slug', 'category']
+        fields = ["id", "name", "slug", "category"]
 
 
 class StageSerializer(serializers.Serializer):

@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { discoveryApi, referenceApi } from '@/lib/api';
-import AuthGuard from '@/components/AuthGuard';
-import MentorCard from '@/components/MentorCard';
-import Select from '@/components/Select';
-import Input from '@/components/Input';
-import Button from '@/components/Button';
-import type { MentorProfile, IndustryCategory, Objective } from '@/types';
-import { Search, X } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { discoveryApi, referenceApi } from "@/lib/api";
+import AuthGuard from "@/components/AuthGuard";
+import MentorCard from "@/components/MentorCard";
+import Select from "@/components/Select";
+import Input from "@/components/Input";
+import Button from "@/components/Button";
+import type { MentorProfile, IndustryCategory, Objective } from "@/types";
+import { Search, X } from "lucide-react";
 
 export default function MentorsPage() {
   const [mentors, setMentors] = useState<MentorProfile[]>([]);
@@ -17,9 +17,9 @@ export default function MentorsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [totalCount, setTotalCount] = useState(0);
 
-  const [search, setSearch] = useState('');
-  const [industryFilter, setIndustryFilter] = useState('');
-  const [objectiveFilter, setObjectiveFilter] = useState('');
+  const [search, setSearch] = useState("");
+  const [industryFilter, setIndustryFilter] = useState("");
+  const [objectiveFilter, setObjectiveFilter] = useState("");
 
   useEffect(() => {
     const fetchReferenceData = async () => {
@@ -31,7 +31,7 @@ export default function MentorsPage() {
         setIndustries(industriesData);
         setObjectives(objectivesData);
       } catch (error) {
-        console.error('Error fetching reference data:', error);
+        console.error("Error fetching reference data:", error);
       }
     };
     fetchReferenceData();
@@ -43,14 +43,15 @@ export default function MentorsPage() {
       try {
         const params: Record<string, string> = {};
         if (search) params.search = search;
-        if (industryFilter) params['expertise_industries__slug'] = industryFilter;
-        if (objectiveFilter) params['can_help_with__slug'] = objectiveFilter;
+        if (industryFilter)
+          params["expertise_industries__slug"] = industryFilter;
+        if (objectiveFilter) params["can_help_with__slug"] = objectiveFilter;
 
         const data = await discoveryApi.getMentors(params);
         setMentors(data.results);
         setTotalCount(data.count);
       } catch (error) {
-        console.error('Error fetching mentors:', error);
+        console.error("Error fetching mentors:", error);
       } finally {
         setIsLoading(false);
       }
@@ -61,9 +62,9 @@ export default function MentorsPage() {
   }, [search, industryFilter, objectiveFilter]);
 
   const clearFilters = () => {
-    setSearch('');
-    setIndustryFilter('');
-    setObjectiveFilter('');
+    setSearch("");
+    setIndustryFilter("");
+    setObjectiveFilter("");
   };
 
   const hasFilters = search || industryFilter || objectiveFilter;
@@ -72,7 +73,7 @@ export default function MentorsPage() {
     cat.subcategories.map((sub) => ({
       value: sub.slug,
       label: `${cat.name} / ${sub.name}`,
-    }))
+    })),
   );
 
   const objectiveOptions = objectives.map((obj) => ({
@@ -131,7 +132,9 @@ export default function MentorsPage() {
           </div>
         ) : mentors.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-500">No mentors found matching your criteria.</p>
+            <p className="text-gray-500">
+              No mentors found matching your criteria.
+            </p>
           </div>
         ) : (
           <div className="grid gap-4">

@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { discoveryApi, connectionApi } from '@/lib/api';
-import AuthGuard from '@/components/AuthGuard';
-import Button from '@/components/Button';
-import Badge from '@/components/Badge';
-import Modal from '@/components/Modal';
-import Textarea from '@/components/Textarea';
-import type { MentorProfile } from '@/types';
-import { ArrowLeft, User } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
+import { discoveryApi, connectionApi } from "@/lib/api";
+import AuthGuard from "@/components/AuthGuard";
+import Button from "@/components/Button";
+import Badge from "@/components/Badge";
+import Modal from "@/components/Modal";
+import Textarea from "@/components/Textarea";
+import type { MentorProfile } from "@/types";
+import { ArrowLeft, User } from "lucide-react";
 
 export default function MentorDetailPage() {
   const params = useParams();
@@ -18,9 +18,9 @@ export default function MentorDetailPage() {
   const [mentor, setMentor] = useState<MentorProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchMentor = async () => {
@@ -28,8 +28,8 @@ export default function MentorDetailPage() {
         const data = await discoveryApi.getMentor(Number(params.id));
         setMentor(data);
       } catch (error) {
-        console.error('Error fetching mentor:', error);
-        router.push('/mentors');
+        console.error("Error fetching mentor:", error);
+        router.push("/mentors");
       } finally {
         setIsLoading(false);
       }
@@ -42,7 +42,7 @@ export default function MentorDetailPage() {
 
     try {
       setIsSending(true);
-      setError('');
+      setError("");
       await connectionApi.sendRequest(mentor.user.id, message || undefined);
       setIsModalOpen(false);
       // Refresh mentor data to update connection status
@@ -50,7 +50,7 @@ export default function MentorDetailPage() {
       setMentor(updatedMentor);
     } catch (err: unknown) {
       const error = err as { response?: { data?: { to_user?: string[] } } };
-      setError(error.response?.data?.to_user?.[0] || 'Failed to send request');
+      setError(error.response?.data?.to_user?.[0] || "Failed to send request");
     } finally {
       setIsSending(false);
     }
@@ -103,13 +103,19 @@ export default function MentorDetailPage() {
               <p className="text-lg text-gray-600">
                 {mentor.role} @ {mentor.company}
               </p>
-              <p className="text-gray-500">{mentor.years_of_experience} years experience</p>
+              <p className="text-gray-500">
+                {mentor.years_of_experience} years experience
+              </p>
             </div>
             <div>
-              {mentor.connection_status === 'accepted' ? (
-                <Badge variant="success" className="text-sm px-4 py-2">Connected</Badge>
-              ) : mentor.connection_status === 'pending' ? (
-                <Badge variant="warning" className="text-sm px-4 py-2">Pending</Badge>
+              {mentor.connection_status === "accepted" ? (
+                <Badge variant="success" className="text-sm px-4 py-2">
+                  Connected
+                </Badge>
+              ) : mentor.connection_status === "pending" ? (
+                <Badge variant="warning" className="text-sm px-4 py-2">
+                  Pending
+                </Badge>
               ) : (
                 <Button onClick={() => setIsModalOpen(true)} size="lg">
                   Request Introduction
@@ -124,8 +130,12 @@ export default function MentorDetailPage() {
           {mentor.user.bio && (
             <>
               <div className="mb-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-3">About</h2>
-                <p className="text-gray-600 whitespace-pre-wrap">{mentor.user.bio}</p>
+                <h2 className="text-lg font-semibold text-gray-900 mb-3">
+                  About
+                </h2>
+                <p className="text-gray-600 whitespace-pre-wrap">
+                  {mentor.user.bio}
+                </p>
               </div>
               <hr className="my-6 border-gray-200" />
             </>
@@ -133,7 +143,9 @@ export default function MentorDetailPage() {
 
           {/* Industries */}
           <div className="mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-3">Industries</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-3">
+              Industries
+            </h2>
             <div className="flex flex-wrap gap-2">
               {mentor.expertise_industries_detail.map((industry) => (
                 <Badge key={industry.id} variant="primary">
@@ -145,25 +157,30 @@ export default function MentorDetailPage() {
 
           {/* Can Help With */}
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-3">Can Help With</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-3">
+              Can Help With
+            </h2>
             <div className="flex flex-wrap gap-2">
               {mentor.can_help_with_detail.map((objective) => (
-                <Badge key={objective.id}>
-                  {objective.name}
-                </Badge>
+                <Badge key={objective.id}>{objective.name}</Badge>
               ))}
             </div>
           </div>
 
           {/* Connected - show email */}
-          {mentor.connection_status === 'accepted' && (
+          {mentor.connection_status === "accepted" && (
             <>
               <hr className="my-6 border-gray-200" />
               <div>
-                <h2 className="text-lg font-semibold text-gray-900 mb-3">Contact</h2>
+                <h2 className="text-lg font-semibold text-gray-900 mb-3">
+                  Contact
+                </h2>
                 <p className="text-gray-600">
                   <span className="mr-2">&#128231;</span>
-                  <a href={`mailto:${mentor.user.email}`} className="text-primary-600 hover:underline">
+                  <a
+                    href={`mailto:${mentor.user.email}`}
+                    className="text-primary-600 hover:underline"
+                  >
                     {mentor.user.email}
                   </a>
                 </p>

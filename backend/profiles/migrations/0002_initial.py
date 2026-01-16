@@ -10,30 +10,42 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('industries', '0001_initial'),
-        ('profiles', '0001_initial'),
+        ("industries", "0001_initial"),
+        ("profiles", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='founderprofile',
-            name='user',
-            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='founder_profile', to=settings.AUTH_USER_MODEL),
+            model_name="founderprofile",
+            name="user",
+            field=models.OneToOneField(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="founder_profile",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
-            model_name='mentorprofile',
-            name='can_help_with',
-            field=models.ManyToManyField(related_name='mentors', to='industries.objective'),
+            model_name="mentorprofile",
+            name="can_help_with",
+            field=models.ManyToManyField(
+                related_name="mentors", to="industries.objective"
+            ),
         ),
         migrations.AddField(
-            model_name='mentorprofile',
-            name='expertise_industries',
-            field=models.ManyToManyField(related_name='mentors', to='industries.industrysubcategory'),
+            model_name="mentorprofile",
+            name="expertise_industries",
+            field=models.ManyToManyField(
+                related_name="mentors", to="industries.industrysubcategory"
+            ),
         ),
         migrations.AddField(
-            model_name='mentorprofile',
-            name='user',
-            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='mentor_profile', to=settings.AUTH_USER_MODEL),
+            model_name="mentorprofile",
+            name="user",
+            field=models.OneToOneField(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="mentor_profile",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

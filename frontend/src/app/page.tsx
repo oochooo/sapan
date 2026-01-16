@@ -1,5 +1,5 @@
-import Link from 'next/link';
-import { Search, Users, Network } from 'lucide-react';
+import Link from "next/link";
+import { Search, Users, Network } from "lucide-react";
 
 export default function LandingPage() {
   return (
@@ -39,7 +39,9 @@ export default function LandingPage() {
             <div className="w-14 h-14 bg-primary-100 rounded-lg flex items-center justify-center mx-auto mb-4">
               <Search className="w-7 h-7 text-primary-600" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Find Mentors</h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              Find Mentors
+            </h3>
             <p className="text-gray-600">
               Browse experts by industry & expertise
             </p>
@@ -48,7 +50,9 @@ export default function LandingPage() {
             <div className="w-14 h-14 bg-primary-100 rounded-lg flex items-center justify-center mx-auto mb-4">
               <Users className="w-7 h-7 text-primary-600" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Get Guidance</h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              Get Guidance
+            </h3>
             <p className="text-gray-600">
               Pitch review, fundraising, go-to-market
             </p>
@@ -57,7 +61,9 @@ export default function LandingPage() {
             <div className="w-14 h-14 bg-primary-100 rounded-lg flex items-center justify-center mx-auto mb-4">
               <Network className="w-7 h-7 text-primary-600" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Build Network</h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              Build Network
+            </h3>
             <p className="text-gray-600">
               Connect with Thailand&apos;s top startup minds
             </p>
@@ -72,16 +78,25 @@ export default function LandingPage() {
             Industries We Support
           </h2>
           <div className="flex flex-wrap justify-center gap-3">
-            {['SaaS', 'FinTech', 'HealthTech', 'EdTech', 'DeepTech/AI', 'Marketplace', 'Consumer/D2C', 'Hardware/IoT', 'FoodTech', 'Services'].map(
-              (industry) => (
-                <span
-                  key={industry}
-                  className="px-4 py-2 bg-white rounded-full text-gray-700 border border-gray-200 text-sm font-medium"
-                >
-                  {industry}
-                </span>
-              )
-            )}
+            {[
+              "SaaS",
+              "FinTech",
+              "HealthTech",
+              "EdTech",
+              "DeepTech/AI",
+              "Marketplace",
+              "Consumer/D2C",
+              "Hardware/IoT",
+              "FoodTech",
+              "Services",
+            ].map((industry) => (
+              <span
+                key={industry}
+                className="px-4 py-2 bg-white rounded-full text-gray-700 border border-gray-200 text-sm font-medium"
+              >
+                {industry}
+              </span>
+            ))}
           </div>
         </div>
       </div>

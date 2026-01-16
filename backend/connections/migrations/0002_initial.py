@@ -10,23 +10,31 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('connections', '0001_initial'),
+        ("connections", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='connectionrequest',
-            name='from_user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='sent_requests', to=settings.AUTH_USER_MODEL),
+            model_name="connectionrequest",
+            name="from_user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="sent_requests",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
-            model_name='connectionrequest',
-            name='to_user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='received_requests', to=settings.AUTH_USER_MODEL),
+            model_name="connectionrequest",
+            name="to_user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="received_requests",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AlterUniqueTogether(
-            name='connectionrequest',
-            unique_together={('from_user', 'to_user')},
+            name="connectionrequest",
+            unique_together={("from_user", "to_user")},
         ),
     ]

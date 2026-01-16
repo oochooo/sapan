@@ -3,11 +3,13 @@ export interface User {
   email: string;
   first_name: string;
   last_name: string;
-  user_type: 'founder' | 'mentor';
+  user_type: "founder" | "mentor" | "";
   profile_photo: string | null;
   bio: string | null;
   is_approved: boolean;
   has_profile: boolean;
+  is_profile_complete: boolean;
+  avatar_url: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -29,7 +31,7 @@ export interface Objective {
   id: number;
   name: string;
   slug: string;
-  category: 'fundraising' | 'operations';
+  category: "fundraising" | "operations";
 }
 
 export interface Stage {
@@ -63,7 +65,7 @@ export interface MentorProfile {
   can_help_with: number[];
   can_help_with_detail: Objective[];
   is_connected?: boolean;
-  connection_status?: 'pending' | 'accepted' | 'declined' | null;
+  connection_status?: "pending" | "accepted" | "declined" | null;
   created_at: string;
   updated_at: string;
 }
@@ -75,7 +77,7 @@ export interface ConnectionRequest {
   to_user: number;
   to_user_detail: UserWithProfile;
   message: string | null;
-  status: 'pending' | 'accepted' | 'declined';
+  status: "pending" | "accepted" | "declined";
   created_at: string;
   responded_at: string | null;
 }

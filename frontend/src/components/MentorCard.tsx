@@ -1,7 +1,7 @@
-import Link from 'next/link';
-import type { MentorProfile } from '@/types';
-import Badge from './Badge';
-import { User } from 'lucide-react';
+import Link from "next/link";
+import type { MentorProfile } from "@/types";
+import Badge from "./Badge";
+import { User } from "lucide-react";
 
 interface MentorCardProps {
   mentor: MentorProfile;
@@ -41,9 +41,7 @@ export default function MentorCard({ mentor }: MentorCardProps) {
               </Badge>
             ))}
             {mentor.can_help_with_detail.slice(0, 2).map((objective) => (
-              <Badge key={objective.id}>
-                {objective.name}
-              </Badge>
+              <Badge key={objective.id}>{objective.name}</Badge>
             ))}
           </div>
           {mentor.user.bio && (

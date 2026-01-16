@@ -1,8 +1,9 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/lib/auth';
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/auth";
+import UserTypeModal from "./UserTypeModal";
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -10,17 +11,23 @@ interface AuthGuardProps {
 
 export default function AuthGuard({ children }: AuthGuardProps) {
   const router = useRouter();
-  const { isAuthenticated, isLoading, user } = useAuth();
+  const { isAuthenticated, isLoading, user, refreshUser } = useAuth();
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      router.push('/login');
+      router.push("/login");
     }
   }, [isAuthenticated, isLoading, router]);
 
   useEffect(() => {
-    if (!isLoading && isAuthenticated && user && !user.has_profile) {
-      router.push('/onboarding');
+    if (
+      !isLoading &&
+      isAuthenticated &&
+      user &&
+      user.is_profile_complete &&
+      !user.has_profile
+    ) {
+      router.push("/onboarding");
     }
   }, [isAuthenticated, isLoading, user, router]);
 
@@ -34,6 +41,15 @@ export default function AuthGuard({ children }: AuthGuardProps) {
 
   if (!isAuthenticated) {
     return null;
+  }
+
+  if (user && !user.is_profile_complete) {
+    return (
+      <>
+        {children}
+        <UserTypeModal onComplete={() => refreshUser()} />
+      </>
+    );
   }
 
   return <>{children}</>;

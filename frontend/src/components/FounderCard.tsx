@@ -1,7 +1,7 @@
-import Link from 'next/link';
-import type { FounderProfile } from '@/types';
-import Badge from './Badge';
-import { User } from 'lucide-react';
+import Link from "next/link";
+import type { FounderProfile } from "@/types";
+import Badge from "./Badge";
+import { User } from "lucide-react";
 
 interface FounderCardProps {
   founder: FounderProfile;

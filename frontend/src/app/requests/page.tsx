@@ -1,21 +1,23 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { connectionApi } from '@/lib/api';
-import { useAuth } from '@/lib/auth';
-import AuthGuard from '@/components/AuthGuard';
-import Button from '@/components/Button';
-import Badge from '@/components/Badge';
-import type { ConnectionRequest } from '@/types';
-import { User, Clock, CheckCircle, XCircle } from 'lucide-react';
-import clsx from 'clsx';
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { connectionApi } from "@/lib/api";
+import { useAuth } from "@/lib/auth";
+import AuthGuard from "@/components/AuthGuard";
+import Button from "@/components/Button";
+import Badge from "@/components/Badge";
+import type { ConnectionRequest } from "@/types";
+import { User, Clock, CheckCircle, XCircle } from "lucide-react";
+import clsx from "clsx";
 
 export default function RequestsPage() {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<'sent' | 'received'>('sent');
+  const [activeTab, setActiveTab] = useState<"sent" | "received">("sent");
   const [sentRequests, setSentRequests] = useState<ConnectionRequest[]>([]);
-  const [receivedRequests, setReceivedRequests] = useState<ConnectionRequest[]>([]);
+  const [receivedRequests, setReceivedRequests] = useState<ConnectionRequest[]>(
+    [],
+  );
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -28,7 +30,7 @@ export default function RequestsPage() {
         setSentRequests(sent.results);
         setReceivedRequests(received.results);
       } catch (error) {
-        console.error('Error fetching requests:', error);
+        console.error("Error fetching requests:", error);
       } finally {
         setIsLoading(false);
       }
@@ -41,7 +43,7 @@ export default function RequestsPage() {
       await connectionApi.acceptRequest(id);
       setReceivedRequests((prev) => prev.filter((r) => r.id !== id));
     } catch (error) {
-      console.error('Error accepting request:', error);
+      console.error("Error accepting request:", error);
     }
   };
 
@@ -50,38 +52,42 @@ export default function RequestsPage() {
       await connectionApi.declineRequest(id);
       setReceivedRequests((prev) => prev.filter((r) => r.id !== id));
     } catch (error) {
-      console.error('Error declining request:', error);
+      console.error("Error declining request:", error);
     }
   };
 
-  const pendingSentCount = sentRequests.filter((r) => r.status === 'pending').length;
+  const pendingSentCount = sentRequests.filter(
+    (r) => r.status === "pending",
+  ).length;
   const pendingReceivedCount = receivedRequests.length;
 
   return (
     <AuthGuard>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">Connection Requests</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">
+          Connection Requests
+        </h1>
 
         {/* Tabs */}
         <div className="flex gap-4 mb-6">
           <button
-            onClick={() => setActiveTab('sent')}
+            onClick={() => setActiveTab("sent")}
             className={clsx(
-              'px-6 py-3 rounded-lg font-medium transition-colors',
-              activeTab === 'sent'
-                ? 'bg-primary-50 text-primary-700 border-2 border-primary-600'
-                : 'bg-white text-gray-600 border border-gray-200 hover:border-gray-300'
+              "px-6 py-3 rounded-lg font-medium transition-colors",
+              activeTab === "sent"
+                ? "bg-primary-50 text-primary-700 border-2 border-primary-600"
+                : "bg-white text-gray-600 border border-gray-200 hover:border-gray-300",
             )}
           >
             Sent ({pendingSentCount} pending)
           </button>
           <button
-            onClick={() => setActiveTab('received')}
+            onClick={() => setActiveTab("received")}
             className={clsx(
-              'px-6 py-3 rounded-lg font-medium transition-colors',
-              activeTab === 'received'
-                ? 'bg-primary-50 text-primary-700 border-2 border-primary-600'
-                : 'bg-white text-gray-600 border border-gray-200 hover:border-gray-300'
+              "px-6 py-3 rounded-lg font-medium transition-colors",
+              activeTab === "received"
+                ? "bg-primary-50 text-primary-700 border-2 border-primary-600"
+                : "bg-white text-gray-600 border border-gray-200 hover:border-gray-300",
             )}
           >
             Received ({pendingReceivedCount} new)
@@ -95,11 +101,13 @@ export default function RequestsPage() {
           </div>
         ) : (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            {activeTab === 'sent' ? (
+            {activeTab === "sent" ? (
               sentRequests.length === 0 ? (
                 <div className="text-center py-12">
-                  <p className="text-gray-500">You haven&apos;t sent any requests yet.</p>
-                  {user?.user_type === 'founder' && (
+                  <p className="text-gray-500">
+                    You haven&apos;t sent any requests yet.
+                  </p>
+                  {user?.user_type === "founder" && (
                     <Link
                       href="/mentors"
                       className="mt-4 inline-block text-primary-600 hover:text-primary-700"
@@ -133,32 +141,39 @@ export default function RequestsPage() {
                               <h3 className="text-lg font-semibold text-gray-900">
                                 {targetUser.first_name} {targetUser.last_name}
                               </h3>
-                              {request.status === 'pending' && (
+                              {request.status === "pending" && (
                                 <Badge variant="warning">
                                   <Clock className="w-3 h-3 mr-1" /> Pending
                                 </Badge>
                               )}
-                              {request.status === 'accepted' && (
+                              {request.status === "accepted" && (
                                 <Badge variant="success">
-                                  <CheckCircle className="w-3 h-3 mr-1" /> Accepted
+                                  <CheckCircle className="w-3 h-3 mr-1" />{" "}
+                                  Accepted
                                 </Badge>
                               )}
-                              {request.status === 'declined' && (
+                              {request.status === "declined" && (
                                 <Badge variant="danger">
                                   <XCircle className="w-3 h-3 mr-1" /> Declined
                                 </Badge>
                               )}
                             </div>
                             <p className="text-sm text-gray-600">
-                              {targetUser.profile?.role} @ {targetUser.profile?.company}
+                              {targetUser.profile?.role} @{" "}
+                              {targetUser.profile?.company}
                             </p>
                             <p className="text-xs text-gray-400 mt-1">
-                              Sent {new Date(request.created_at).toLocaleDateString()}
+                              Sent{" "}
+                              {new Date(
+                                request.created_at,
+                              ).toLocaleDateString()}
                             </p>
                             {request.message && (
                               <div className="mt-3 p-3 bg-gray-50 rounded-md">
                                 <p className="text-sm text-gray-600">
-                                  <span className="font-medium">Your message:</span>
+                                  <span className="font-medium">
+                                    Your message:
+                                  </span>
                                   <br />
                                   &ldquo;{request.message}&rdquo;
                                 </p>
@@ -166,13 +181,13 @@ export default function RequestsPage() {
                             )}
                           </div>
                           {request.to_user_detail.profile_id && (
-                          <Link
-                            href={`/mentors/${request.to_user_detail.profile_id}`}
-                            className="text-sm font-medium text-primary-600 hover:text-primary-700"
-                          >
-                            View Profile &rarr;
-                          </Link>
-                        )}
+                            <Link
+                              href={`/mentors/${request.to_user_detail.profile_id}`}
+                              className="text-sm font-medium text-primary-600 hover:text-primary-700"
+                            >
+                              View Profile &rarr;
+                            </Link>
+                          )}
                         </div>
                       </div>
                     );
@@ -222,7 +237,8 @@ export default function RequestsPage() {
                             )}
                           </div>
                           <p className="text-xs text-gray-400 mt-2">
-                            Received {new Date(request.created_at).toLocaleDateString()}
+                            Received{" "}
+                            {new Date(request.created_at).toLocaleDateString()}
                           </p>
                           {request.message && (
                             <div className="mt-3 p-3 bg-gray-50 rounded-md">
@@ -242,7 +258,10 @@ export default function RequestsPage() {
                           >
                             Decline
                           </Button>
-                          <Button size="sm" onClick={() => handleAccept(request.id)}>
+                          <Button
+                            size="sm"
+                            onClick={() => handleAccept(request.id)}
+                          >
                             Accept
                           </Button>
                           {request.from_user_detail.profile_id && (

@@ -9,32 +9,73 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('industries', '0001_initial'),
+        ("industries", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='MentorProfile',
+            name="MentorProfile",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('company', models.CharField(max_length=200)),
-                ('role', models.CharField(max_length=200)),
-                ('years_of_experience', models.IntegerField()),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("company", models.CharField(max_length=200)),
+                ("role", models.CharField(max_length=200)),
+                ("years_of_experience", models.IntegerField()),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
         ),
         migrations.CreateModel(
-            name='FounderProfile',
+            name="FounderProfile",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('startup_name', models.CharField(max_length=200)),
-                ('stage', models.CharField(choices=[('idea', 'Idea Stage'), ('pre_seed', 'Pre-seed'), ('seed', 'Seed'), ('series_a', 'Series A'), ('growth', 'Growth')], max_length=20)),
-                ('about_startup', models.TextField()),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('industry', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='founders', to='industries.industrysubcategory')),
-                ('objectives', models.ManyToManyField(related_name='founders', to='industries.objective')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("startup_name", models.CharField(max_length=200)),
+                (
+                    "stage",
+                    models.CharField(
+                        choices=[
+                            ("idea", "Idea Stage"),
+                            ("pre_seed", "Pre-seed"),
+                            ("seed", "Seed"),
+                            ("series_a", "Series A"),
+                            ("growth", "Growth"),
+                        ],
+                        max_length=20,
+                    ),
+                ),
+                ("about_startup", models.TextField()),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "industry",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="founders",
+                        to="industries.industrysubcategory",
+                    ),
+                ),
+                (
+                    "objectives",
+                    models.ManyToManyField(
+                        related_name="founders", to="industries.objective"
+                    ),
+                ),
             ],
         ),
     ]

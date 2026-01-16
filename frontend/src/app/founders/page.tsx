@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { discoveryApi, referenceApi } from '@/lib/api';
-import AuthGuard from '@/components/AuthGuard';
-import FounderCard from '@/components/FounderCard';
-import Select from '@/components/Select';
-import Input from '@/components/Input';
-import Button from '@/components/Button';
-import type { FounderProfile, IndustryCategory, Stage } from '@/types';
-import { Search, X } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { discoveryApi, referenceApi } from "@/lib/api";
+import AuthGuard from "@/components/AuthGuard";
+import FounderCard from "@/components/FounderCard";
+import Select from "@/components/Select";
+import Input from "@/components/Input";
+import Button from "@/components/Button";
+import type { FounderProfile, IndustryCategory, Stage } from "@/types";
+import { Search, X } from "lucide-react";
 
 export default function FoundersPage() {
   const [founders, setFounders] = useState<FounderProfile[]>([]);
@@ -17,9 +17,9 @@ export default function FoundersPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [totalCount, setTotalCount] = useState(0);
 
-  const [search, setSearch] = useState('');
-  const [industryFilter, setIndustryFilter] = useState('');
-  const [stageFilter, setStageFilter] = useState('');
+  const [search, setSearch] = useState("");
+  const [industryFilter, setIndustryFilter] = useState("");
+  const [stageFilter, setStageFilter] = useState("");
 
   useEffect(() => {
     const fetchReferenceData = async () => {
@@ -31,7 +31,7 @@ export default function FoundersPage() {
         setIndustries(industriesData);
         setStages(stagesData);
       } catch (error) {
-        console.error('Error fetching reference data:', error);
+        console.error("Error fetching reference data:", error);
       }
     };
     fetchReferenceData();
@@ -43,14 +43,14 @@ export default function FoundersPage() {
       try {
         const params: Record<string, string> = {};
         if (search) params.search = search;
-        if (industryFilter) params['industry__slug'] = industryFilter;
+        if (industryFilter) params["industry__slug"] = industryFilter;
         if (stageFilter) params.stage = stageFilter;
 
         const data = await discoveryApi.getFounders(params);
         setFounders(data.results);
         setTotalCount(data.count);
       } catch (error) {
-        console.error('Error fetching founders:', error);
+        console.error("Error fetching founders:", error);
       } finally {
         setIsLoading(false);
       }
@@ -61,9 +61,9 @@ export default function FoundersPage() {
   }, [search, industryFilter, stageFilter]);
 
   const clearFilters = () => {
-    setSearch('');
-    setIndustryFilter('');
-    setStageFilter('');
+    setSearch("");
+    setIndustryFilter("");
+    setStageFilter("");
   };
 
   const hasFilters = search || industryFilter || stageFilter;
@@ -72,7 +72,7 @@ export default function FoundersPage() {
     cat.subcategories.map((sub) => ({
       value: sub.slug,
       label: `${cat.name} / ${sub.name}`,
-    }))
+    })),
   );
 
   const stageOptions = stages.map((s) => ({
@@ -131,7 +131,9 @@ export default function FoundersPage() {
           </div>
         ) : founders.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-500">No founders found matching your criteria.</p>
+            <p className="text-gray-500">
+              No founders found matching your criteria.
+            </p>
           </div>
         ) : (
           <div className="grid gap-4">

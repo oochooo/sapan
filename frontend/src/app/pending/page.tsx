@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { useAuth } from '@/lib/auth';
-import { Clock } from 'lucide-react';
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useAuth } from "@/lib/auth";
+import { Clock } from "lucide-react";
 
 export default function PendingApprovalPage() {
   const router = useRouter();
@@ -12,10 +12,10 @@ export default function PendingApprovalPage() {
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      router.push('/login');
+      router.push("/login");
     }
     if (!isLoading && isAuthenticated && user?.is_approved) {
-      router.push('/dashboard');
+      router.push("/dashboard");
     }
   }, [isLoading, isAuthenticated, user, router]);
 
@@ -40,11 +40,14 @@ export default function PendingApprovalPage() {
           </h1>
 
           <p className="text-gray-600 mb-6">
-            Thank you for applying to be a mentor on Sapan.io! Our team is reviewing your
-            application. You&apos;ll receive an email once approved.
+            Thank you for applying to be a mentor on Sapan.io! Our team is
+            reviewing your application. You&apos;ll receive an email once
+            approved.
           </p>
 
-          <p className="text-sm text-gray-500 mb-8">This usually takes 2-3 days.</p>
+          <p className="text-sm text-gray-500 mb-8">
+            This usually takes 2-3 days.
+          </p>
 
           <Link
             href="/"

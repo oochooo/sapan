@@ -1,19 +1,21 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { useAuth } from '@/lib/auth';
-import { connectionApi, discoveryApi } from '@/lib/api';
-import AuthGuard from '@/components/AuthGuard';
-import { Card, CardContent, CardHeader } from '@/components/Card';
-import MentorCard from '@/components/MentorCard';
-import type { Connection, ConnectionRequest, MentorProfile } from '@/types';
-import { Clock, Users, ArrowRight } from 'lucide-react';
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { useAuth } from "@/lib/auth";
+import { connectionApi, discoveryApi } from "@/lib/api";
+import AuthGuard from "@/components/AuthGuard";
+import { Card, CardContent, CardHeader } from "@/components/Card";
+import MentorCard from "@/components/MentorCard";
+import type { Connection, ConnectionRequest, MentorProfile } from "@/types";
+import { Clock, Users, ArrowRight } from "lucide-react";
 
 export default function DashboardPage() {
   const { user } = useAuth();
   const [connections, setConnections] = useState<Connection[]>([]);
-  const [pendingRequests, setPendingRequests] = useState<ConnectionRequest[]>([]);
+  const [pendingRequests, setPendingRequests] = useState<ConnectionRequest[]>(
+    [],
+  );
   const [suggestedMentors, setSuggestedMentors] = useState<MentorProfile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -22,20 +24,22 @@ export default function DashboardPage() {
       try {
         const [connectionsData, requestsData] = await Promise.all([
           connectionApi.getConnections(),
-          user?.user_type === 'founder'
+          user?.user_type === "founder"
             ? connectionApi.getSentRequests()
             : connectionApi.getReceivedRequests(),
         ]);
 
         setConnections(connectionsData.results);
-        setPendingRequests(requestsData.results.filter((r) => r.status === 'pending'));
+        setPendingRequests(
+          requestsData.results.filter((r) => r.status === "pending"),
+        );
 
-        if (user?.user_type === 'founder') {
+        if (user?.user_type === "founder") {
           const mentorsData = await discoveryApi.getMentors({ page: 1 });
           setSuggestedMentors(mentorsData.results.slice(0, 3));
         }
       } catch (error) {
-        console.error('Error fetching dashboard data:', error);
+        console.error("Error fetching dashboard data:", error);
       } finally {
         setIsLoading(false);
       }
@@ -46,7 +50,7 @@ export default function DashboardPage() {
     }
   }, [user]);
 
-  if (!user?.is_approved && user?.user_type === 'mentor') {
+  if (!user?.is_approved && user?.user_type === "mentor") {
     return (
       <AuthGuard>
         <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
@@ -56,10 +60,13 @@ export default function DashboardPage() {
               Your Application is Pending
             </h1>
             <p className="text-gray-600 mb-6">
-              Thank you for applying to be a mentor on Sapan.io! Our team is reviewing your
-              application. You&apos;ll receive an email once approved.
+              Thank you for applying to be a mentor on Sapan.io! Our team is
+              reviewing your application. You&apos;ll receive an email once
+              approved.
             </p>
-            <p className="text-sm text-gray-500">This usually takes 2-3 days.</p>
+            <p className="text-sm text-gray-500">
+              This usually takes 2-3 days.
+            </p>
             <Link
               href="/"
               className="mt-6 inline-block px-6 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
@@ -95,7 +102,9 @@ export default function DashboardPage() {
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">Pending Requests</p>
-                      <p className="text-3xl font-bold text-gray-900">{pendingRequests.length}</p>
+                      <p className="text-3xl font-bold text-gray-900">
+                        {pendingRequests.length}
+                      </p>
                     </div>
                   </div>
                   <Link
@@ -115,7 +124,9 @@ export default function DashboardPage() {
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">Total Connections</p>
-                      <p className="text-3xl font-bold text-gray-900">{connections.length}</p>
+                      <p className="text-3xl font-bold text-gray-900">
+                        {connections.length}
+                      </p>
                     </div>
                   </div>
                   <Link
@@ -131,24 +142,34 @@ export default function DashboardPage() {
             {/* Recent Activity */}
             <Card className="mb-8">
               <CardHeader>
-                <h2 className="text-lg font-semibold text-gray-900">Recent Activity</h2>
+                <h2 className="text-lg font-semibold text-gray-900">
+                  Recent Activity
+                </h2>
               </CardHeader>
               <CardContent>
                 {connections.length === 0 && pendingRequests.length === 0 ? (
-                  <p className="text-gray-500 text-center py-4">No recent activity</p>
+                  <p className="text-gray-500 text-center py-4">
+                    No recent activity
+                  </p>
                 ) : (
                   <div className="space-y-4">
                     {connections.slice(0, 4).map((connection) => (
-                      <div key={connection.id} className="flex items-center gap-3">
+                      <div
+                        key={connection.id}
+                        className="flex items-center gap-3"
+                      >
                         <div className="w-2 h-2 bg-green-500 rounded-full" />
                         <p className="text-sm text-gray-600">
                           <span className="font-medium text-gray-900">
-                            {connection.connected_user.first_name} {connection.connected_user.last_name}
-                          </span>{' '}
+                            {connection.connected_user.first_name}{" "}
+                            {connection.connected_user.last_name}
+                          </span>{" "}
                           connected with you
                         </p>
                         <span className="text-xs text-gray-400 ml-auto">
-                          {new Date(connection.connected_at).toLocaleDateString()}
+                          {new Date(
+                            connection.connected_at,
+                          ).toLocaleDateString()}
                         </span>
                       </div>
                     ))}
@@ -158,11 +179,13 @@ export default function DashboardPage() {
             </Card>
 
             {/* Suggested Mentors (for founders) */}
-            {user?.user_type === 'founder' && suggestedMentors.length > 0 && (
+            {user?.user_type === "founder" && suggestedMentors.length > 0 && (
               <Card>
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <h2 className="text-lg font-semibold text-gray-900">Suggested Mentors for You</h2>
+                    <h2 className="text-lg font-semibold text-gray-900">
+                      Suggested Mentors for You
+                    </h2>
                     <Link
                       href="/mentors"
                       className="text-sm text-primary-600 hover:text-primary-700"
