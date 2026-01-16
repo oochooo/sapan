@@ -12,6 +12,10 @@ import type {
   Connection,
   TownhallConnection,
   PaginatedResponse,
+  CalendarStatus,
+  AvailabilityRule,
+  TimeSlot,
+  Booking,
 } from "@/types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
@@ -75,6 +79,15 @@ export const authApi = {
     code: string,
   ): Promise<{ user: User; tokens: AuthTokens }> => {
     const response = await api.post("/auth/line/", { code });
+    return response.data;
+  },
+
+  // Dev login (only works in development)
+  devLogin: async (
+    email: string,
+    password: string,
+  ): Promise<{ user: User; tokens: AuthTokens }> => {
+    const response = await api.post("/auth/dev-login/", { email, password });
     return response.data;
   },
 
@@ -247,6 +260,102 @@ export const connectionApi = {
 
   declineRequest: async (id: number): Promise<ConnectionRequest> => {
     const response = await api.post(`/connections/request/${id}/decline/`);
+    return response.data;
+  },
+};
+
+// Office Hours
+export const officeHoursApi = {
+  // Calendar OAuth
+  getCalendarAuthUrl: async (
+    redirectUri: string,
+  ): Promise<{ auth_url: string }> => {
+    const response = await api.get("/office-hours/calendar/auth-url/", {
+      params: { redirect_uri: redirectUri },
+    });
+    return response.data;
+  },
+
+  exchangeCalendarCode: async (
+    code: string,
+    redirectUri: string,
+  ): Promise<{ message: string; expires_at: string }> => {
+    const response = await api.post("/office-hours/calendar/callback/", {
+      code,
+      redirect_uri: redirectUri,
+    });
+    return response.data;
+  },
+
+  getCalendarStatus: async (): Promise<CalendarStatus> => {
+    const response = await api.get("/office-hours/calendar/status/");
+    return response.data;
+  },
+
+  disconnectCalendar: async (): Promise<{ message: string }> => {
+    const response = await api.delete("/office-hours/calendar/disconnect/");
+    return response.data;
+  },
+
+  // Availability
+  getAvailability: async (): Promise<AvailabilityRule[]> => {
+    const response = await api.get("/office-hours/availability/");
+    return response.data;
+  },
+
+  createAvailability: async (data: {
+    weekday: number;
+    start_time: string;
+    end_time: string;
+    slot_duration_minutes?: number;
+    timezone?: string;
+    is_active?: boolean;
+  }): Promise<AvailabilityRule> => {
+    const response = await api.post("/office-hours/availability/", data);
+    return response.data;
+  },
+
+  updateAvailability: async (
+    id: number,
+    data: Partial<AvailabilityRule>,
+  ): Promise<AvailabilityRule> => {
+    const response = await api.put(`/office-hours/availability/${id}/`, data);
+    return response.data;
+  },
+
+  deleteAvailability: async (id: number): Promise<void> => {
+    await api.delete(`/office-hours/availability/${id}/`);
+  },
+
+  // Slots
+  getMentorSlots: async (
+    mentorId: number,
+    params?: { date?: string; days?: number },
+  ): Promise<{ slots: TimeSlot[]; message?: string }> => {
+    const response = await api.get(`/office-hours/mentors/${mentorId}/slots/`, {
+      params,
+    });
+    return response.data;
+  },
+
+  // Bookings
+  getBookings: async (): Promise<PaginatedResponse<Booking>> => {
+    const response = await api.get("/office-hours/bookings/");
+    return response.data;
+  },
+
+  createBooking: async (data: {
+    mentor_id: number;
+    start_time: string;
+    end_time: string;
+    agenda?: string;
+  }): Promise<Booking> => {
+    const response = await api.post("/office-hours/bookings/", data);
+    return response.data;
+  },
+
+  cancelBooking: async (id: number): Promise<Booking> => {
+    const response = await api.post(`/office-hours/bookings/${id}/cancel/`);
     return response.data;
   },
 };

@@ -4,14 +4,16 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { discoveryApi, connectionApi } from "@/lib/api";
+import { useAuth } from "@/lib/auth";
 import AuthGuard from "@/components/AuthGuard";
 import Button from "@/components/Button";
 import Badge from "@/components/Badge";
 import Modal from "@/components/Modal";
 import Textarea from "@/components/Textarea";
 import Select from "@/components/Select";
+import BookingModal from "@/components/BookingModal";
 import type { MentorProfile, ConnectionIntent } from "@/types";
-import { ArrowLeft, User } from "lucide-react";
+import { ArrowLeft, User, Calendar } from "lucide-react";
 
 const INTENT_OPTIONS = [
   { value: "mentor_me", label: "I'd like mentorship" },
@@ -22,13 +24,16 @@ const INTENT_OPTIONS = [
 export default function MentorDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const { user } = useAuth();
   const [mentor, setMentor] = useState<MentorProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [intent, setIntent] = useState<ConnectionIntent>("mentor_me");
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState("");
+  const [bookingSuccess, setBookingSuccess] = useState(false);
 
   useEffect(() => {
     const fetchMentor = async () => {
@@ -115,11 +120,24 @@ export default function MentorDetailPage() {
                 {mentor.years_of_experience} years experience
               </p>
             </div>
-            <div>
+            <div className="flex flex-col gap-2">
               {mentor.connection_status === "accepted" ? (
-                <Badge variant="success" className="text-sm px-4 py-2">
-                  Connected
-                </Badge>
+                <>
+                  <Badge variant="success" className="text-sm px-4 py-2">
+                    Connected
+                  </Badge>
+                  {user?.user_type === "founder" && (
+                    <Button
+                      onClick={() => setIsBookingModalOpen(true)}
+                      variant="outline"
+                      size="lg"
+                      className="flex items-center gap-2"
+                    >
+                      <Calendar className="w-4 h-4" />
+                      Book Office Hours
+                    </Button>
+                  )}
+                </>
               ) : mentor.connection_status === "pending" ? (
                 <Badge variant="warning" className="text-sm px-4 py-2">
                   Pending
@@ -195,6 +213,19 @@ export default function MentorDetailPage() {
               </div>
             </>
           )}
+
+          {/* Booking success message */}
+          {bookingSuccess && (
+            <>
+              <hr className="my-6 border-gray-200" />
+              <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-green-700">
+                  Office hours booked successfully! Check your email for
+                  confirmation and meeting details.
+                </p>
+              </div>
+            </>
+          )}
         </div>
       </div>
 
@@ -236,6 +267,17 @@ export default function MentorDetailPage() {
           </div>
         </div>
       </Modal>
+
+      {/* Booking Modal */}
+      <BookingModal
+        mentor={mentor}
+        isOpen={isBookingModalOpen}
+        onClose={() => setIsBookingModalOpen(false)}
+        onSuccess={() => {
+          setBookingSuccess(true);
+          setTimeout(() => setBookingSuccess(false), 5000);
+        }}
+      />
     </AuthGuard>
   );
 }

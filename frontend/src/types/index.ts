@@ -144,3 +144,60 @@ export interface PaginatedResponse<T> {
   previous: string | null;
   results: T[];
 }
+
+// Office Hours types
+export interface CalendarStatus {
+  is_connected: boolean;
+  expires_at?: string;
+  created_at?: string;
+}
+
+export interface AvailabilityRule {
+  id: number;
+  weekday: number;
+  weekday_display: string;
+  start_time: string;
+  end_time: string;
+  slot_duration_minutes: number;
+  timezone: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TimeSlot {
+  start_time: string;
+  end_time: string;
+  is_available: boolean;
+}
+
+export type BookingStatus =
+  | "confirmed"
+  | "cancelled_by_founder"
+  | "cancelled_by_mentor"
+  | "completed";
+
+export interface BookingUser {
+  id: number;
+  email: string;
+  full_name: string;
+  profile_photo: string | null;
+  avatar_url: string | null;
+}
+
+export interface Booking {
+  id: number;
+  mentor: number;
+  founder: number;
+  mentor_info: BookingUser;
+  founder_info: BookingUser;
+  start_time: string;
+  end_time: string;
+  agenda: string;
+  google_meet_link: string;
+  status: BookingStatus;
+  status_display: string;
+  reminder_sent: boolean;
+  created_at: string;
+  updated_at: string;
+}

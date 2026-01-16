@@ -114,3 +114,50 @@ class MeView(generics.RetrieveUpdateAPIView):
         if self.request.method in ["PUT", "PATCH"]:
             return UserUpdateSerializer
         return UserSerializer
+
+
+class DevLoginView(APIView):
+    """
+    Development-only login endpoint for testing with mock users.
+    Only available when DEBUG=True.
+    """
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        if not settings.DEBUG:
+            return Response(
+                {"error": "This endpoint is only available in development mode."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        email = request.data.get("email")
+        password = request.data.get("password")
+
+        if not email or not password:
+            return Response(
+                {"error": "Email and password are required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response(
+                {"error": "Invalid credentials."},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+        if not user.check_password(password):
+            return Response(
+                {"error": "Invalid credentials."},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            "user": UserSerializer(user).data,
+            "tokens": {
+                "access": str(refresh.access_token),
+                "refresh": str(refresh),
+            },
+        })

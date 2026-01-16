@@ -9,6 +9,7 @@ urlpatterns = [
     path("api/profiles/", include("profiles.urls")),
     path("api/", include("industries.urls")),
     path("api/", include("connections.urls")),
+    path("api/office-hours/", include("office_hours.urls")),
 ]
 
 if settings.DEBUG:

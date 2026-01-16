@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "profiles",
     "industries",
     "connections",
+    "office_hours",
 ]
 
 SITE_ID = 1
@@ -194,3 +195,7 @@ SOCIALACCOUNT_PROVIDERS = {
 
 # Adapter for social login
 SOCIALACCOUNT_ADAPTER = "users.adapters.SocialAccountAdapter"
+
+# Google API credentials (used by both allauth and calendar service)
+GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
+GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", "")

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 
@@ -13,15 +13,36 @@ const LINE_REDIRECT_URI =
   process.env.NEXT_PUBLIC_LINE_REDIRECT_URI ||
   "http://localhost:3000/auth/callback/line";
 
+const isDev = process.env.NODE_ENV === "development";
+
 export default function LoginPage() {
   const router = useRouter();
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, devLogin } = useAuth();
+  const [showDevLogin, setShowDevLogin] = useState(false);
+  const [devEmail, setDevEmail] = useState("");
+  const [devPassword, setDevPassword] = useState("");
+  const [devError, setDevError] = useState("");
+  const [isDevLoggingIn, setIsDevLoggingIn] = useState(false);
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
       router.push("/dashboard");
     }
   }, [isAuthenticated, isLoading, router]);
+
+  const handleDevLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setDevError("");
+    setIsDevLoggingIn(true);
+    try {
+      await devLogin(devEmail, devPassword);
+      router.push("/dashboard");
+    } catch {
+      setDevError("Invalid credentials");
+    } finally {
+      setIsDevLoggingIn(false);
+    }
+  };
 
   const handleGoogleLogin = () => {
     const params = new URLSearchParams({
@@ -108,6 +129,58 @@ export default function LoginPage() {
           <p className="mt-8 text-center text-xs text-gray-500">
             By continuing, you agree to our Terms of Service and Privacy Policy
           </p>
+
+          {/* Dev Login Section - Only in development */}
+          {isDev && (
+            <div className="mt-6 pt-6 border-t border-gray-200">
+              <button
+                onClick={() => setShowDevLogin(!showDevLogin)}
+                className="w-full text-center text-sm text-gray-500 hover:text-gray-700"
+              >
+                {showDevLogin ? "Hide" : "Show"} Dev Login
+              </button>
+
+              {showDevLogin && (
+                <form onSubmit={handleDevLogin} className="mt-4 space-y-3">
+                  <div className="text-xs text-amber-600 bg-amber-50 p-2 rounded">
+                    Dev mode only. Use mock accounts:
+                    <br />
+                    mentor1@mock.sapan.io / founder1@mock.sapan.io
+                    <br />
+                    Password: mockpassword123
+                  </div>
+
+                  {devError && (
+                    <div className="text-sm text-red-600 bg-red-50 p-2 rounded">
+                      {devError}
+                    </div>
+                  )}
+
+                  <input
+                    type="email"
+                    value={devEmail}
+                    onChange={(e) => setDevEmail(e.target.value)}
+                    placeholder="Email"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                  />
+                  <input
+                    type="password"
+                    value={devPassword}
+                    onChange={(e) => setDevPassword(e.target.value)}
+                    placeholder="Password"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                  />
+                  <button
+                    type="submit"
+                    disabled={isDevLoggingIn}
+                    className="w-full py-2 bg-gray-800 text-white text-sm rounded-md hover:bg-gray-900 disabled:opacity-50"
+                  >
+                    {isDevLoggingIn ? "Logging in..." : "Dev Login"}
+                  </button>
+                </form>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
