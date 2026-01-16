@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { Settings, Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { officeHoursApi } from "@/lib/api";
-import Navbar from "@/components/Navbar";
 import CalendarConnectionStatus from "@/components/CalendarConnectionStatus";
 import AvailabilityEditor from "@/components/AvailabilityEditor";
 import type { CalendarStatus, AvailabilityRule } from "@/types";
@@ -52,20 +51,14 @@ export default function SettingsPage() {
 
   if (authLoading || isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <Navbar />
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
-        </div>
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar />
-
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="flex items-center gap-3 mb-8">
           <div className="p-2 bg-primary-100 rounded-lg">
@@ -111,7 +104,6 @@ export default function SettingsPage() {
               </p>
             </div>
           )}
-        </div>
       </div>
     </div>
   );

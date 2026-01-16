@@ -4,7 +4,6 @@ import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2, CheckCircle, XCircle } from "lucide-react";
 import { officeHoursApi } from "@/lib/api";
-import Navbar from "@/components/Navbar";
 
 function CalendarCallbackContent() {
   const router = useRouter();
@@ -52,11 +51,8 @@ function CalendarCallbackContent() {
   }, [searchParams, router]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar />
-
-      <div className="flex items-center justify-center py-20">
-        <div className="bg-white rounded-lg border border-gray-200 p-8 max-w-md w-full text-center">
+    <div className="flex items-center justify-center py-20">
+      <div className="bg-white rounded-lg border border-gray-200 p-8 max-w-md w-full text-center">
           {status === "loading" && (
             <>
               <Loader2 className="h-12 w-12 animate-spin text-primary-600 mx-auto mb-4" />
@@ -97,7 +93,6 @@ function CalendarCallbackContent() {
               </button>
             </>
           )}
-        </div>
       </div>
     </div>
   );
@@ -107,11 +102,8 @@ export default function CalendarCallbackPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-gray-50">
-          <Navbar />
-          <div className="flex items-center justify-center py-20">
-            <Loader2 className="h-12 w-12 animate-spin text-primary-600" />
-          </div>
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="h-12 w-12 animate-spin text-primary-600" />
         </div>
       }
     >

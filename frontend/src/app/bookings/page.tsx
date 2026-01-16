@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { Calendar, Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { officeHoursApi } from "@/lib/api";
-import Navbar from "@/components/Navbar";
 import BookingCard from "@/components/BookingCard";
 import type { Booking } from "@/types";
 
@@ -54,20 +53,14 @@ export default function BookingsPage() {
 
   if (authLoading || isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <Navbar />
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
-        </div>
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar />
-
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
@@ -128,7 +121,6 @@ export default function BookingsPage() {
             ))}
           </div>
         )}
-      </div>
     </div>
   );
 }
