@@ -50,6 +50,8 @@ export interface FounderProfile {
   objectives: number[];
   objectives_detail: Objective[];
   about_startup: string;
+  is_connected?: boolean;
+  connection_status?: "pending" | "accepted" | "declined" | null;
   created_at: string;
   updated_at: string;
 }
@@ -70,6 +72,8 @@ export interface MentorProfile {
   updated_at: string;
 }
 
+export type ConnectionIntent = "mentor_me" | "collaborate" | "peer_network";
+
 export interface ConnectionRequest {
   id: number;
   from_user: number;
@@ -77,9 +81,38 @@ export interface ConnectionRequest {
   to_user: number;
   to_user_detail: UserWithProfile;
   message: string | null;
+  intent: ConnectionIntent;
+  intent_display: string;
   status: "pending" | "accepted" | "declined";
   created_at: string;
   responded_at: string | null;
+}
+
+// Townhall feed types (auth-aware)
+export interface TownhallUserAnonymous {
+  type: "founder" | "mentor";
+  description: string;
+}
+
+export interface TownhallUserAuthenticated {
+  id: number;
+  first_name: string;
+  last_name: string;
+  user_type: "founder" | "mentor";
+  startup_name?: string;
+  industry?: string;
+  company?: string;
+  role?: string;
+  profile_id?: number;
+}
+
+export type TownhallUser = TownhallUserAnonymous | TownhallUserAuthenticated;
+
+export interface TownhallConnection {
+  id: number;
+  from_user_detail: TownhallUser;
+  to_user_detail: TownhallUser;
+  connected_at: string;
 }
 
 export interface UserWithProfile extends User {

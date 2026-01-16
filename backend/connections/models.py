@@ -9,6 +9,12 @@ class ConnectionRequest(models.Model):
         ("declined", "Declined"),
     ]
 
+    INTENT_CHOICES = [
+        ("mentor_me", "I'd like mentorship"),
+        ("collaborate", "Let's collaborate"),
+        ("peer_network", "Peer networking"),
+    ]
+
     from_user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="sent_requests"
     )
@@ -18,6 +24,9 @@ class ConnectionRequest(models.Model):
         related_name="received_requests",
     )
     message = models.TextField(null=True, blank=True)
+    intent = models.CharField(
+        max_length=20, choices=INTENT_CHOICES, default="peer_network"
+    )
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
     created_at = models.DateTimeField(auto_now_add=True)
     responded_at = models.DateTimeField(null=True, blank=True)

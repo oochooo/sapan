@@ -131,9 +131,12 @@ class MentorListSerializer(serializers.ModelSerializer):
         if not request or not request.user.is_authenticated:
             return False
         from connections.models import ConnectionRequest
+        from django.db.models import Q
 
         return ConnectionRequest.objects.filter(
-            from_user=request.user, to_user=obj.user, status="accepted"
+            Q(from_user=request.user, to_user=obj.user)
+            | Q(from_user=obj.user, to_user=request.user),
+            status="accepted",
         ).exists()
 
     def get_connection_status(self, obj):
@@ -141,9 +144,11 @@ class MentorListSerializer(serializers.ModelSerializer):
         if not request or not request.user.is_authenticated:
             return None
         from connections.models import ConnectionRequest
+        from django.db.models import Q
 
         connection = ConnectionRequest.objects.filter(
-            from_user=request.user, to_user=obj.user
+            Q(from_user=request.user, to_user=obj.user)
+            | Q(from_user=obj.user, to_user=request.user)
         ).first()
         return connection.status if connection else None
 
@@ -155,6 +160,8 @@ class FounderListSerializer(serializers.ModelSerializer):
         source="objectives", many=True, read_only=True
     )
     stage_display = serializers.CharField(source="get_stage_display", read_only=True)
+    is_connected = serializers.SerializerMethodField()
+    connection_status = serializers.SerializerMethodField()
 
     class Meta:
         model = FounderProfile
@@ -167,4 +174,32 @@ class FounderListSerializer(serializers.ModelSerializer):
             "stage_display",
             "objectives_detail",
             "about_startup",
+            "is_connected",
+            "connection_status",
         ]
+
+    def get_is_connected(self, obj):
+        request = self.context.get("request")
+        if not request or not request.user.is_authenticated:
+            return False
+        from connections.models import ConnectionRequest
+        from django.db.models import Q
+
+        return ConnectionRequest.objects.filter(
+            Q(from_user=request.user, to_user=obj.user)
+            | Q(from_user=obj.user, to_user=request.user),
+            status="accepted",
+        ).exists()
+
+    def get_connection_status(self, obj):
+        request = self.context.get("request")
+        if not request or not request.user.is_authenticated:
+            return None
+        from connections.models import ConnectionRequest
+        from django.db.models import Q
+
+        connection = ConnectionRequest.objects.filter(
+            Q(from_user=request.user, to_user=obj.user)
+            | Q(from_user=obj.user, to_user=request.user)
+        ).first()
+        return connection.status if connection else None

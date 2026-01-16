@@ -9,8 +9,15 @@ import Button from "@/components/Button";
 import Badge from "@/components/Badge";
 import Modal from "@/components/Modal";
 import Textarea from "@/components/Textarea";
-import type { MentorProfile } from "@/types";
+import Select from "@/components/Select";
+import type { MentorProfile, ConnectionIntent } from "@/types";
 import { ArrowLeft, User } from "lucide-react";
+
+const INTENT_OPTIONS = [
+  { value: "mentor_me", label: "I'd like mentorship" },
+  { value: "collaborate", label: "Let's collaborate" },
+  { value: "peer_network", label: "Peer networking" },
+];
 
 export default function MentorDetailPage() {
   const params = useParams();
@@ -19,6 +26,7 @@ export default function MentorDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [message, setMessage] = useState("");
+  const [intent, setIntent] = useState<ConnectionIntent>("mentor_me");
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState("");
 
@@ -43,7 +51,7 @@ export default function MentorDetailPage() {
     try {
       setIsSending(true);
       setError("");
-      await connectionApi.sendRequest(mentor.user.id, message || undefined);
+      await connectionApi.sendRequest(mentor.user.id, message || undefined, intent);
       setIsModalOpen(false);
       // Refresh mentor data to update connection status
       const updatedMentor = await discoveryApi.getMentor(mentor.id);
@@ -194,7 +202,7 @@ export default function MentorDetailPage() {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={`Request Introduction to ${mentor.user.first_name}`}
+        title={`Connect with ${mentor.user.first_name}`}
       >
         <div className="space-y-4">
           {error && (
@@ -202,6 +210,13 @@ export default function MentorDetailPage() {
               {error}
             </div>
           )}
+
+          <Select
+            label="What brings you here?"
+            options={INTENT_OPTIONS}
+            value={intent}
+            onChange={(e) => setIntent(e.target.value as ConnectionIntent)}
+          />
 
           <Textarea
             label="Add a message (optional)"

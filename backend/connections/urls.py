@@ -6,10 +6,16 @@ from .views import (
     SendRequestView,
     AcceptRequestView,
     DeclineRequestView,
+    RecentConnectionsView,
 )
 
 urlpatterns = [
     path("connections/", ConnectionListView.as_view(), name="connection-list"),
+    path(
+        "connections/recent/",
+        RecentConnectionsView.as_view(),
+        name="recent-connections",
+    ),
     path(
         "connections/requests/sent/", SentRequestsView.as_view(), name="sent-requests"
     ),

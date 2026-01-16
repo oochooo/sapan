@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Search, Users, Network } from "lucide-react";
+import { TownhallFeed } from "@/components/TownhallFeed";
 
 export default function LandingPage() {
   return (
@@ -30,6 +31,11 @@ export default function LandingPage() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Townhall Feed - Live Connections */}
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 mb-12 relative z-10">
+        <TownhallFeed />
       </div>
 
       {/* Features Section */}

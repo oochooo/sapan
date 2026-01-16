@@ -54,6 +54,7 @@ class UserConnectionSerializer(serializers.ModelSerializer):
 class ConnectionRequestSerializer(serializers.ModelSerializer):
     from_user_detail = UserConnectionSerializer(source="from_user", read_only=True)
     to_user_detail = UserConnectionSerializer(source="to_user", read_only=True)
+    intent_display = serializers.CharField(source="get_intent_display", read_only=True)
 
     class Meta:
         model = ConnectionRequest
@@ -64,6 +65,8 @@ class ConnectionRequestSerializer(serializers.ModelSerializer):
             "to_user",
             "to_user_detail",
             "message",
+            "intent",
+            "intent_display",
             "status",
             "created_at",
             "responded_at",
@@ -74,21 +77,30 @@ class ConnectionRequestSerializer(serializers.ModelSerializer):
 class ConnectionRequestCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = ConnectionRequest
-        fields = ["to_user", "message"]
+        fields = ["to_user", "message", "intent"]
 
     def validate_to_user(self, value):
         request = self.context["request"]
         if value == request.user:
             raise serializers.ValidationError("You cannot send a request to yourself.")
-        if value.user_type != "mentor":
-            raise serializers.ValidationError("You can only send requests to mentors.")
         if not value.is_approved:
-            raise serializers.ValidationError("This mentor is not yet approved.")
+            raise serializers.ValidationError("This user is not yet approved.")
+        if not value.is_profile_complete:
+            raise serializers.ValidationError(
+                "This user has not completed their profile."
+            )
+        # Check for existing request in either direction
         if ConnectionRequest.objects.filter(
             from_user=request.user, to_user=value
         ).exists():
             raise serializers.ValidationError(
-                "You have already sent a request to this mentor."
+                "You have already sent a request to this user."
+            )
+        if ConnectionRequest.objects.filter(
+            from_user=value, to_user=request.user
+        ).exists():
+            raise serializers.ValidationError(
+                "This user has already sent you a request."
             )
         return value
 
@@ -110,3 +122,69 @@ class ConnectionSerializer(serializers.ModelSerializer):
         if request and request.user == obj.from_user:
             return UserConnectionSerializer(obj.to_user).data
         return UserConnectionSerializer(obj.from_user).data
+
+
+class TownhallConnectionSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the townhall feed.
+    Returns full details for authenticated users, anonymized for guests.
+    """
+
+    from_user_detail = serializers.SerializerMethodField()
+    to_user_detail = serializers.SerializerMethodField()
+    connected_at = serializers.DateTimeField(source="responded_at")
+
+    class Meta:
+        model = ConnectionRequest
+        fields = ["id", "from_user_detail", "to_user_detail", "connected_at"]
+
+    def _get_anonymous_profile(self, user):
+        """Return anonymized profile info for non-authenticated users."""
+        if user.user_type == "founder" and hasattr(user, "founder_profile"):
+            profile = user.founder_profile
+            industry = profile.industry.name if profile.industry else "tech"
+            return {
+                "type": "founder",
+                "description": f"A {industry.lower()} founder",
+            }
+        elif user.user_type == "mentor" and hasattr(user, "mentor_profile"):
+            profile = user.mentor_profile
+            years = profile.years_of_experience or 0
+            exp_text = f"{years}+ years experience" if years > 0 else "experienced"
+            return {
+                "type": "mentor",
+                "description": f"A mentor with {exp_text}",
+            }
+        return {"type": user.user_type, "description": f"A {user.user_type}"}
+
+    def _get_full_profile(self, user):
+        """Return full profile info for authenticated users."""
+        base = {
+            "id": user.id,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "user_type": user.user_type,
+        }
+        if user.user_type == "founder" and hasattr(user, "founder_profile"):
+            profile = user.founder_profile
+            base["startup_name"] = profile.startup_name
+            base["industry"] = profile.industry.name if profile.industry else None
+            base["profile_id"] = profile.id
+        elif user.user_type == "mentor" and hasattr(user, "mentor_profile"):
+            profile = user.mentor_profile
+            base["company"] = profile.company
+            base["role"] = profile.role
+            base["profile_id"] = profile.id
+        return base
+
+    def get_from_user_detail(self, obj):
+        request = self.context.get("request")
+        if request and request.user and request.user.is_authenticated:
+            return self._get_full_profile(obj.from_user)
+        return self._get_anonymous_profile(obj.from_user)
+
+    def get_to_user_detail(self, obj):
+        request = self.context.get("request")
+        if request and request.user and request.user.is_authenticated:
+            return self._get_full_profile(obj.to_user)
+        return self._get_anonymous_profile(obj.to_user)

@@ -3,17 +3,32 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { discoveryApi } from "@/lib/api";
+import { discoveryApi, connectionApi } from "@/lib/api";
 import AuthGuard from "@/components/AuthGuard";
+import Button from "@/components/Button";
 import Badge from "@/components/Badge";
-import type { FounderProfile } from "@/types";
+import Modal from "@/components/Modal";
+import Textarea from "@/components/Textarea";
+import Select from "@/components/Select";
+import type { FounderProfile, ConnectionIntent } from "@/types";
 import { ArrowLeft, User } from "lucide-react";
+
+const INTENT_OPTIONS = [
+  { value: "mentor_me", label: "I'd like to mentor them" },
+  { value: "collaborate", label: "Let's collaborate" },
+  { value: "peer_network", label: "Peer networking" },
+];
 
 export default function FounderDetailPage() {
   const params = useParams();
   const router = useRouter();
   const [founder, setFounder] = useState<FounderProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [message, setMessage] = useState("");
+  const [intent, setIntent] = useState<ConnectionIntent>("mentor_me");
+  const [isSending, setIsSending] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchFounder = async () => {
@@ -29,6 +44,25 @@ export default function FounderDetailPage() {
     };
     fetchFounder();
   }, [params.id, router]);
+
+  const handleSendRequest = async () => {
+    if (!founder) return;
+
+    try {
+      setIsSending(true);
+      setError("");
+      await connectionApi.sendRequest(founder.user.id, message || undefined, intent);
+      setIsModalOpen(false);
+      // Refresh founder data to update connection status
+      const updatedFounder = await discoveryApi.getFounder(founder.id);
+      setFounder(updatedFounder);
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { to_user?: string[] } } };
+      setError(error.response?.data?.to_user?.[0] || "Failed to send request");
+    } finally {
+      setIsSending(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -86,6 +120,21 @@ export default function FounderDetailPage() {
                 <Badge>{founder.stage_display}</Badge>
               </div>
             </div>
+            <div>
+              {founder.connection_status === "accepted" ? (
+                <Badge variant="success" className="text-sm px-4 py-2">
+                  Connected
+                </Badge>
+              ) : founder.connection_status === "pending" ? (
+                <Badge variant="warning" className="text-sm px-4 py-2">
+                  Pending
+                </Badge>
+              ) : (
+                <Button onClick={() => setIsModalOpen(true)} size="lg">
+                  Connect
+                </Button>
+              )}
+            </div>
           </div>
 
           <hr className="my-6 border-gray-200" />
@@ -113,8 +162,68 @@ export default function FounderDetailPage() {
               ))}
             </div>
           </div>
+
+          {/* Connected - show email */}
+          {founder.connection_status === "accepted" && (
+            <>
+              <hr className="my-6 border-gray-200" />
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900 mb-3">
+                  Contact
+                </h2>
+                <p className="text-gray-600">
+                  <span className="mr-2">&#128231;</span>
+                  <a
+                    href={`mailto:${founder.user.email}`}
+                    className="text-primary-600 hover:underline"
+                  >
+                    {founder.user.email}
+                  </a>
+                </p>
+              </div>
+            </>
+          )}
         </div>
       </div>
+
+      {/* Request Modal */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title={`Connect with ${founder.user.first_name}`}
+      >
+        <div className="space-y-4">
+          {error && (
+            <div className="p-3 bg-red-50 border border-red-200 rounded-md text-sm text-red-600">
+              {error}
+            </div>
+          )}
+
+          <Select
+            label="What brings you here?"
+            options={INTENT_OPTIONS}
+            value={intent}
+            onChange={(e) => setIntent(e.target.value as ConnectionIntent)}
+          />
+
+          <Textarea
+            label="Add a message (optional)"
+            placeholder={`Hi ${founder.user.first_name}, I'm reaching out because...`}
+            rows={4}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+          />
+
+          <div className="flex gap-3 justify-end">
+            <Button variant="outline" onClick={() => setIsModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSendRequest} isLoading={isSending}>
+              Send Request
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </AuthGuard>
   );
 }
